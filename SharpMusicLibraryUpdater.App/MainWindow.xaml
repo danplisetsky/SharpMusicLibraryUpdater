@@ -5,8 +5,98 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SharpMusicLibraryUpdater.App"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="SharpMusicLibraryUpdater" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" AllowDrop="False">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" />
+        <CommandBinding Command="Refresh" />
+        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommandBindingCloseWindow_CanExecute"
+                        Executed="CommandBindingCloseWindow_Executed" />
+        <CommandBinding Command="Properties" />
+    </Window.CommandBindings>
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open Music Folder..." Command="Open">
+                    <MenuItem.Icon>
+                        <Image Source="Images\folder.png" Width="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Check for New Albums" Command="Refresh">
+                    <MenuItem.Icon>
+                        <Image Source="Images\refresh.png" Width="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="_Exit" Command="{x:Static SystemCommands.CloseWindowCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Settings" Command="Properties">
+                    <MenuItem.Icon>
+                        <Image Source="Images\settings.png" Width="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <ToolBarTray Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsLocked="True">
+            <ToolBar>         
+                <Button Command="Open">
+                    <Image Source="Images\folder.png" Width="32" />
+                </Button>
+                <Button Command="Refresh">                    
+                    <Image Source="Images\refresh.png" Width="32" />                    
+                </Button>
+                <Separator />
+                <Button Command="Properties">
+                    <Image Source="Images\settings.png" Width="32" />
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+
+        <Grid Grid.Row="2" Grid.Column="0">
+            <GroupBox Header="Artists">
+                <DataGrid AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name"/>
+                        <DataGridCheckBoxColumn Header="Ignore" />
+                        <DataGridCheckBoxColumn Header="Check for Singles" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+        </Grid>
         
+        <Grid Grid.Row="2" Grid.Column="1">
+            <GroupBox Header="Albums">
+                <DataGrid AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+        </Grid>
+
+        <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" />
     </Grid>
 </Window>
