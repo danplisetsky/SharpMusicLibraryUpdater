@@ -24,5 +24,9 @@ namespace SharpMusicLibraryUpdater.App
         {
             InitializeComponent();
         }
+
+        private void CommandBindingCloseWindow_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
+
+        private void CommandBindingCloseWindow_Executed(object sender, ExecutedRoutedEventArgs e) => SystemCommands.CloseWindow(this);
     }
 }
