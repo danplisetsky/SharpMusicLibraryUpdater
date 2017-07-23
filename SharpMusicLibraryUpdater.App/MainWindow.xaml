@@ -87,9 +87,9 @@
                 <DataGrid Name="dataGrid_Artists" AutoGenerateColumns="False" ItemsSource="{Binding ModelCollectionView}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
-                        <DataGridCheckBoxColumn Header="Ignore" IsReadOnly="True" />
+                        <!--<DataGridCheckBoxColumn Header="Ignore" IsReadOnly="True" />
                         <DataGridCheckBoxColumn Header="Check for Singles" IsReadOnly="True" />
-                        <DataGridTextColumn Header="New Albums Available" />
+                        <DataGridTextColumn Header="New Albums Available" />-->
                     </DataGrid.Columns>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
@@ -107,7 +107,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding AlbumName}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Release Date" Binding="{Binding ReleaseDate}" IsReadOnly="True" />
-                        <DataGridCheckBoxColumn Header="Ignore in Future Checks" IsReadOnly="True" />
+                        <!--<DataGridCheckBoxColumn Header="Ignore in Future Checks" IsReadOnly="True" />-->
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
