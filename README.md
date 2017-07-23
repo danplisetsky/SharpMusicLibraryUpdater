@@ -1,4 +1,4 @@
-SharpMusicLibraryUpdater
+SharpMusicLibraryUpdater [![Build status](https://ci.appveyor.com/api/projects/status/bkh9ghotmfc1hiis?svg=true)](https://ci.appveyor.com/project/danplisetsky/sharpmusiclibraryupdater)
 ========================
 ## Elevator Pitch
 Have a sizable music llibrary? Store it in a folder, band by band? Want to know when one of the bands releases a new album without having to check for it manually? Then this is an app for you!
