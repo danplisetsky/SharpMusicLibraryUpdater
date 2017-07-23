@@ -12,6 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SharpMusicLibraryUpdater.App.ViewModels;
+using SharpMusicLibraryUpdater.App.Services;
+using iTunesSearch.Library;
+using System.Windows.Interactivity;
 
 namespace SharpMusicLibraryUpdater.App
 {
@@ -23,6 +27,7 @@ namespace SharpMusicLibraryUpdater.App
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(), dataGrid_Albums);
         }
 
         private void CommandBindingCloseWindow_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
