@@ -4,24 +4,31 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SharpMusicLibraryUpdater.App"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.WIndows.Interactivity"
         mc:Ignorable="d"
-        Title="SharpMusicLibraryUpdater" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" AllowDrop="False">
+        Name="mainWindow"
+        Title="SharpMusicLibraryUpdater" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" AllowDrop="False"
+        IsEnabled="{Binding IsNotBusy}" MinHeight="600" MinWidth="800">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles.xaml" />
+                <ResourceDictionary Source="Resources/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="Open" />
-        <CommandBinding Command="Refresh" />
         <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommandBindingCloseWindow_CanExecute"
                         Executed="CommandBindingCloseWindow_Executed" />
         <CommandBinding Command="Properties" />
     </Window.CommandBindings>
+
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding OpenMusicLibraryCommand}" Key="O" Modifiers="Ctrl" />
+        <KeyBinding Command="{Binding GetAlbumsCommand}" Key="G" Modifiers="Ctrl" />
+    </Window.InputBindings>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -38,12 +45,12 @@
 
         <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open Music Folder..." Command="Open">
+                <MenuItem Header="_Open Music Library Folder..." Command="{Binding OpenMusicLibraryCommand}" InputGestureText="Ctrl+O">
                     <MenuItem.Icon>
                         <Image Source="Images\folder.png" Width="16" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Check for New Albums" Command="Refresh">
+                <MenuItem Header="_Check for New Albums" Command="{Binding GetAlbumsCommand}" InputGestureText="Ctrl+G">
                     <MenuItem.Icon>
                         <Image Source="Images\refresh.png" Width="16" />
                     </MenuItem.Icon>
@@ -62,10 +69,10 @@
 
         <ToolBarTray Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsLocked="True">
             <ToolBar>         
-                <Button Command="Open">
+                <Button Command="{Binding OpenMusicLibraryCommand}">
                     <Image Source="Images\folder.png" Width="32" />
                 </Button>
-                <Button Command="Refresh">                    
+                <Button Command="{Binding GetAlbumsCommand}">                    
                     <Image Source="Images\refresh.png" Width="32" />                    
                 </Button>
                 <Separator />
@@ -76,27 +83,38 @@
         </ToolBarTray>
 
         <Grid Grid.Row="2" Grid.Column="0">
-            <GroupBox Header="Artists">
-                <DataGrid AutoGenerateColumns="False">
+            <GroupBox Header="Artists">                
+                <DataGrid Name="dataGrid_Artists" AutoGenerateColumns="False" ItemsSource="{Binding ModelCollectionView}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name"/>
-                        <DataGridCheckBoxColumn Header="Ignore" />
-                        <DataGridCheckBoxColumn Header="Check for Singles" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
+                        <DataGridCheckBoxColumn Header="Ignore" IsReadOnly="True" />
+                        <DataGridCheckBoxColumn Header="Check for Singles" IsReadOnly="True" />
+                        <DataGridTextColumn Header="New Albums Available" />
                     </DataGrid.Columns>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding ShowAlbumsCommand}" CommandParameter="{Binding Path=SelectedItem, 
+                                RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </DataGrid>
             </GroupBox>
         </Grid>
         
         <Grid Grid.Row="2" Grid.Column="1">
-            <GroupBox Header="Albums">
-                <DataGrid AutoGenerateColumns="False">
+            <GroupBox Header="New Albums">
+                <DataGrid Name="dataGrid_Albums" AutoGenerateColumns="False" ItemsSource="{Binding NewAlbums}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name"/>
+                        <DataGridTextColumn Header="Name" Binding="{Binding AlbumName}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Release Date" Binding="{Binding ReleaseDate}" IsReadOnly="True" />
+                        <DataGridCheckBoxColumn Header="Ignore in Future Checks" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
         </Grid>
 
-        <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" />
+        <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="20">
+            <ProgressBar IsIndeterminate="{Binding IsNotBusy, Converter={StaticResource negateBooleanConverter}}" MinWidth="100" MinHeight="15" />
+        </StatusBar>
     </Grid>
 </Window>
