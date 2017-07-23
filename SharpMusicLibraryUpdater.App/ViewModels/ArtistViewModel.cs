@@ -79,7 +79,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
             this.IsNotBusy = true;
 
-            string ReadyToCompare(string input) => input.Replace(" ", "").ToUpperInvariant();
+            string ReadyToCompare(string input) => input.Replace("&", "and").Replace(" ", "").ToUpperInvariant();
 
             async Task<List<NewAlbum>> GetNewAlbums(Artist artist)
             {
@@ -122,42 +122,6 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             }
             return String.Empty;
         }
-
-
-
-
-
-        //private (bool isFolderAlbum, Album album) GetAlbumIfFolderIsAlbum(string currentDir) 
-        //{
-        //    (bool isFolderAlbum, Album album) result = (false, null);
-
-        //    var yearInAlbumFolder = GetAlbumYear(currentDir);
-        //    if (yearInAlbumFolder.Success)
-        //    {
-        //        result.isFolderAlbum = true;
-        //        result.album = new Album(GetAlbumName(currentDir, yearInAlbumFolder));
-        //    }
-
-        //    return result;
-
-        //    Match GetAlbumYear(string inputFolder)
-        //    {
-        //        string regexPattern = @"\d{4}";
-        //        return Regex.Match(new DirectoryInfo(inputFolder).Name, regexPattern);
-        //    }
-
-        //    string GetAlbumName(string inputFolder, Match year)
-        //    {
-        //        string nameSansYear = new DirectoryInfo(inputFolder).Name.Remove(year.Index, year.Length);
-
-        //        string regexPattern = @"^[\W]+";
-        //        var match = Regex.Match(nameSansYear, regexPattern);
-        //        string nameSansLeadingNonAlphanumericCharacters = nameSansYear.Remove(match.Index, match.Length);
-        //        string finalName = new string(nameSansLeadingNonAlphanumericCharacters.TakeWhile(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)).ToArray()).Trim();
-        //        return finalName;
-
-        //    }
-        //}
 
         private bool CanOpenMusicLibrary(object param) => true;
 
@@ -245,7 +209,8 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 string regexPattern = @"^[\W]+";
                 var match = Regex.Match(nameSansYear, regexPattern);
                 string nameSansLeadingNonAlphanumericCharacters = nameSansYear.Remove(match.Index, match.Length);
-                string finalName = new string(nameSansLeadingNonAlphanumericCharacters.TakeWhile(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)).ToArray()).Trim();
+                string finalName = new string(nameSansLeadingNonAlphanumericCharacters.TakeWhile(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) || c == '&')
+                    .ToArray()).Trim();
                 return finalName;
             }
         }
