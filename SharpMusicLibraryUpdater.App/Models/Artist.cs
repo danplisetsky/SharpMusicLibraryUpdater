@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
 
 namespace SharpMusicLibraryUpdater.App.Models
 {
@@ -97,6 +98,22 @@ namespace SharpMusicLibraryUpdater.App.Models
                 }
             }
         }
+
+        private Brush _color;
+
+        public Brush Color
+        {
+            get => _color;
+            set
+            {
+                if (_color != value)
+                {
+                    _color = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
 
 

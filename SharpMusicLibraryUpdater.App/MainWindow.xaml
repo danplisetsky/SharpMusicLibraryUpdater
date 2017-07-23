@@ -91,6 +91,11 @@
                         <DataGridCheckBoxColumn Header="Check for Singles" IsReadOnly="True" />
                         <DataGridTextColumn Header="New Albums Available" />-->
                     </DataGrid.Columns>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="{Binding Color}" />
+                        </Style>
+                    </DataGrid.RowStyle>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding ShowAlbumsCommand}" CommandParameter="{Binding Path=SelectedItem, 

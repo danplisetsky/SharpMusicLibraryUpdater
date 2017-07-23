@@ -17,6 +17,7 @@ using System.Collections.Concurrent;
 using System.Windows.Data;
 using System.Windows.Controls;
 using NodaTime;
+using System.Windows.Media;
 
 namespace SharpMusicLibraryUpdater.App.ViewModels
 {
@@ -73,9 +74,9 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             await Task.Run(() => Parallel.ForEach(Artists, async artist =>
             {
                 artist.NewAlbums = await GetNewAlbums(artist);
-
+                artist.Color = artist.NewAlbums.Any() ? Brushes.Green : Brushes.Red;
             }));
-        
+
             this.IsNotBusy = true;
 
             string ReadyToCompare(string input) => input.Replace(" ", "").ToUpperInvariant();
