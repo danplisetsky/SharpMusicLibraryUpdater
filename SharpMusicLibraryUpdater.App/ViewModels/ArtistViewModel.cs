@@ -28,7 +28,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         private readonly iTunesSearchManager searchManager;
         private readonly Settings settings;
 
-        private ObservableCollection<Artist> Artists = new ObservableCollection<Artist>();
+        private readonly ObservableCollection<Artist> Artists = new ObservableCollection<Artist>();
         public ListCollectionView ModelCollectionView { get; private set; }
 
         private DataGrid dataGridAlbums;
@@ -83,9 +83,9 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void OnClosing(object param)
         {
-            settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, Name = ar.Name, IsIgnored = ar.IsIgnored, CheckForSingles = ar.CheckForSingles })
-                .ToList();
-            SettingsSerializer.Serialize(settings);
+            //settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, Name = ar.Name, IsIgnored = ar.IsIgnored, CheckForSingles = ar.CheckForSingles })
+            //    .ToList();
+            //SettingsSerializer.Serialize(settings);
         }
 
         private void ShowAlbums(object param) => dataGridAlbums.DataContext = param as Artist;
@@ -185,6 +185,9 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 }
             }
 
+            this.GetAlbumsCommand.CanExecute(null);
+            this.IsNotBusy = true;
+
             async Task AddArtist(string artistName, string artistFolder)
             {
                 var iTunesArtistInfo = (await searchManager.GetSongArtistsAsync(artistName)).Artists.FirstOrDefault();
@@ -193,8 +196,6 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                     this.Artists.Add(new Artist { Name = artistName, ArtistId = iTunesArtistInfo.ArtistId, LocalAlbums = GetLocalAlbums(artistFolder) });
                 }
             }
-
-            this.IsNotBusy = true;
         }
 
         private List<Album> GetLocalAlbums(string artistFolder)
