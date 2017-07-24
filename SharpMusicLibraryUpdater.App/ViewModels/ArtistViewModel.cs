@@ -18,6 +18,7 @@ using System.Windows.Data;
 using System.Windows.Controls;
 using NodaTime;
 using System.Windows.Media;
+using System.Diagnostics;
 
 namespace SharpMusicLibraryUpdater.App.ViewModels
 {
@@ -25,7 +26,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
     {
         private readonly MusicLibraryReader musicLibraryReader;
         private readonly iTunesSearchManager searchManager;
-        private string currentDirectory; // TODO: probably remove it, go back to only having it in the local OpenMusicFolder scope
+        private readonly Settings settings;
 
         private ObservableCollection<Artist> Artists = new ObservableCollection<Artist>();
         public ListCollectionView ModelCollectionView { get; private set; }
@@ -52,18 +53,39 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         public ICommand OpenMusicLibraryCommand { get; }
         public ICommand GetAlbumsCommand { get; }
         public ICommand ShowAlbumsCommand { get; }
+        public ICommand OnClosingCommand { get; }
 
         public ArtistViewModel(MusicLibraryReader musicLibraryReader, iTunesSearchManager iTunesSearchManager, DataGrid dataGrid_Albums)
         {
             this.searchManager = iTunesSearchManager;
             this.musicLibraryReader = musicLibraryReader;
-            this.OpenMusicLibraryCommand = new DelegateCommand(this.OpenMusicLibrary, this.CanOpenMusicLibrary);
+            this.settings = SettingsSerializer.Deserialize();
+
+            this.OpenMusicLibraryCommand = new DelegateCommand(this.OpenMusicLibrary, this.CommandCanAlwaysExecute);
             this.GetAlbumsCommand = new DelegateCommand(this.GetAlbumsFromITunes, this.CanGetAlbums);
             this.ShowAlbumsCommand = new DelegateCommand(this.ShowAlbums, this.CanGetAlbums);
+            this.OnClosingCommand = new DelegateCommand(this.OnClosing, this.CommandCanAlwaysExecute);
 
             this.ModelCollectionView = new ListCollectionView(Artists);
 
             this.dataGridAlbums = dataGrid_Albums;
+
+            this.ReadSettings();
+        }
+
+        private void ReadSettings()
+        {
+            if (!String.IsNullOrEmpty(settings.MusicLibraryFolder))
+            {
+                this.ReadMusicLibraryAsync(isLoadingFromSettings: true).Wait();
+            }
+        }
+
+        private void OnClosing(object param)
+        {
+            settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, Name = ar.Name, IsIgnored = ar.IsIgnored, CheckForSingles = ar.CheckForSingles })
+                .ToList();
+            SettingsSerializer.Serialize(settings);
         }
 
         private void ShowAlbums(object param) => dataGridAlbums.DataContext = param as Artist;
@@ -74,7 +96,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
             await Task.Run(() => Parallel.ForEach(Artists, async artist =>
             {
-                artist.NewAlbums = await GetNewAlbums(artist);
+                artist.NewAlbums = await GetNewAlbumsAsync(artist);
                 artist.Color = artist.NewAlbums.Any() ? Brushes.Green : Brushes.Red;
             }));
 
@@ -82,7 +104,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
             string ReadyToCompare(string input) => input.Replace("&", "and").Replace(" ", "").ToUpperInvariant();
 
-            async Task<List<NewAlbum>> GetNewAlbums(Artist artist)
+            async Task<List<NewAlbum>> GetNewAlbumsAsync(Artist artist)
             {
                 var iTunesAlbumsSearchResult = (await searchManager.GetAlbumsByArtistIdAsync(artist.ArtistId)).Albums
                     .Where(al => !(String.IsNullOrWhiteSpace(al.CollectionName) || String.IsNullOrEmpty(al.CollectionName)));
@@ -124,27 +146,51 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             return String.Empty;
         }
 
-        private bool CanOpenMusicLibrary(object param) => true;
+        private bool CommandCanAlwaysExecute(object param) => true;
 
         private async void OpenMusicLibrary(object param)
         {
-            currentDirectory = this.SelectFolder();
-            if (String.IsNullOrEmpty(currentDirectory))
+            settings.MusicLibraryFolder = this.SelectFolder();
+            if (String.IsNullOrEmpty(settings.MusicLibraryFolder))
             {
                 return;
             }
+            await ReadMusicLibraryAsync(isLoadingFromSettings: false);
+        }
 
+        private async Task ReadMusicLibraryAsync(bool isLoadingFromSettings)
+        {
             this.IsNotBusy = false;
 
             this.Artists.Clear();
-            var artistsFullLocalPath = musicLibraryReader.ReadMusicLibrary(currentDirectory);
+            var artistsFullLocalPath = musicLibraryReader.ReadMusicLibrary(settings.MusicLibraryFolder);
             foreach (string artistFolder in artistsFullLocalPath)
             {
                 string artistName = new DirectoryInfo(artistFolder).Name.Trim();
+                if (isLoadingFromSettings)
+                {
+                    var artist = settings.Artists.Find(ar => ar.Name == artistName);
+                    if (artist != null)
+                    {
+                        this.Artists.Add(new Artist { Name = artist.Name, ArtistId = artist.ArtistId, LocalAlbums = GetLocalAlbums(artistFolder)});
+                    }
+                    else
+                    {
+                        await AddArtist(artistName, artistFolder);
+                    }
+                }
+                else
+                {
+                    await AddArtist(artistName, artistFolder);
+                }
+            }
+
+            async Task AddArtist(string artistName, string artistFolder)
+            {
                 var iTunesArtistInfo = (await searchManager.GetSongArtistsAsync(artistName)).Artists.FirstOrDefault();
                 if (iTunesArtistInfo != null)
                 {
-                    this.Artists.Add(new Artist { Name = iTunesArtistInfo.ArtistName, ArtistId = iTunesArtistInfo.ArtistId, LocalAlbums = GetLocalAlbums(artistFolder) });
+                    this.Artists.Add(new Artist { Name = artistName, ArtistId = iTunesArtistInfo.ArtistId, LocalAlbums = GetLocalAlbums(artistFolder) });
                 }
             }
 

@@ -10,6 +10,11 @@
         Title="SharpMusicLibraryUpdater" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" AllowDrop="False"
         IsEnabled="{Binding IsNotBusy}" MinHeight="600" MinWidth="800">
 
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding OnClosingCommand}" />
+        </i:EventTrigger>        
+    </i:Interaction.Triggers>
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -21,8 +26,7 @@
 
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommandBindingCloseWindow_CanExecute"
-                        Executed="CommandBindingCloseWindow_Executed" />
-        <CommandBinding Command="Properties" />
+                        Executed="CommandBindingCloseWindow_Executed" />        
     </Window.CommandBindings>
 
     <Window.InputBindings>

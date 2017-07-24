@@ -3,14 +3,17 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Windows.Media;
 
 namespace SharpMusicLibraryUpdater.App.Models
 {
+    [DataContract]
     public class Artist : INotifyPropertyChanged
     {
         private long _artistId;
 
+        [DataMember]
         public long ArtistId
         {
             get => _artistId;
@@ -26,6 +29,7 @@ namespace SharpMusicLibraryUpdater.App.Models
 
         private string _name;
 
+        [DataMember]
         public string Name
         {
             get => _name;
@@ -41,6 +45,7 @@ namespace SharpMusicLibraryUpdater.App.Models
 
         private bool _isIgnored;
 
+        [DataMember]
         public bool IsIgnored
         {
             get => _isIgnored;
@@ -56,6 +61,7 @@ namespace SharpMusicLibraryUpdater.App.Models
 
         private bool _checkForSingles;
 
+        [DataMember]
         public bool CheckForSingles
         {
             get => _checkForSingles;
@@ -71,6 +77,7 @@ namespace SharpMusicLibraryUpdater.App.Models
 
         private List<Album> _localAlbums;
 
+        [IgnoreDataMember]
         public List<Album> LocalAlbums
         {
             get => _localAlbums;
@@ -86,6 +93,7 @@ namespace SharpMusicLibraryUpdater.App.Models
 
         private List<NewAlbum> _newAlbums;
 
+        [IgnoreDataMember]
         public List<NewAlbum> NewAlbums
         {
             get => _newAlbums;
@@ -101,6 +109,7 @@ namespace SharpMusicLibraryUpdater.App.Models
 
         private Brush _color;
 
+        [IgnoreDataMember]
         public Brush Color
         {
             get => _color;
@@ -113,9 +122,6 @@ namespace SharpMusicLibraryUpdater.App.Models
                 }
             }
         }
-
-
-
 
         private void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
 
