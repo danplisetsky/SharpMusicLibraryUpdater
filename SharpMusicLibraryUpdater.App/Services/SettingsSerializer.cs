@@ -17,10 +17,6 @@ namespace SharpMusicLibraryUpdater.App.Services
 
         public static void Serialize(Settings settings)
         {
-            if (settings == null)
-            {
-                throw new NotImplementedException(); // TODO: Clean this up
-            }
             using (fileStream = new FileStream(settingsFilename, FileMode.Create))
             {
                 serializer.WriteObject(fileStream, settings);
