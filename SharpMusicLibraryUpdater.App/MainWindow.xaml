@@ -15,6 +15,7 @@
             <i:InvokeCommandAction Command="{Binding OnClosingCommand}" />
         </i:EventTrigger>        
     </i:Interaction.Triggers>
+    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -80,7 +81,7 @@
                     <Image Source="Images\refresh.png" Width="32" />                    
                 </Button>
                 <Separator />
-                <Button Command="Properties">
+                <Button IsEnabled="False">
                     <Image Source="Images\settings.png" Width="32" />
                 </Button>
             </ToolBar>
