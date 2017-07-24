@@ -83,9 +83,9 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void OnClosing(object param)
         {
-            //settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, Name = ar.Name, IsIgnored = ar.IsIgnored, CheckForSingles = ar.CheckForSingles })
-            //    .ToList();
-            //SettingsSerializer.Serialize(settings);
+            settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, Name = ar.Name, IsIgnored = ar.IsIgnored, CheckForSingles = ar.CheckForSingles })
+                .ToList();
+            SettingsSerializer.Serialize(settings);
         }
 
         private void ShowAlbums(object param) => dataGridAlbums.DataContext = param as Artist;
