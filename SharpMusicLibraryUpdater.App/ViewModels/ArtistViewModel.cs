@@ -71,6 +71,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         private async void GetAlbumsFromITunes(object param)
         {
             this.IsNotBusy = false;
+
             await Task.Run(() => Parallel.ForEach(Artists, async artist =>
             {
                 artist.NewAlbums = await GetNewAlbums(artist);
@@ -209,9 +210,11 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 string regexPattern = @"^[\W]+";
                 var match = Regex.Match(nameSansYear, regexPattern);
                 string nameSansLeadingNonAlphanumericCharacters = nameSansYear.Remove(match.Index, match.Length);
-                string finalName = new string(nameSansLeadingNonAlphanumericCharacters.TakeWhile(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) || c == '&')
+                string finalName = new string(nameSansLeadingNonAlphanumericCharacters.TakeWhile(c => IsAcceptableChar(c))
                     .ToArray()).Trim();
                 return finalName;
+
+                bool IsAcceptableChar(char c) => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) || c == '&' || c ==',';
             }
         }
 
