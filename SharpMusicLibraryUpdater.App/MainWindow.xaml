@@ -96,15 +96,10 @@
                         <DataGridTemplateColumn Header="Ignore">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsIgnored, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                              Command="{Binding Path=DataContext.IgnoreArtistCommand, 
-                                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" 
-                                              CommandParameter="{Binding Path=SelectedItem, 
-                                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" />
+                                    <CheckBox IsChecked="{Binding IsIgnored, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="statusOfIgnoring" Binding="{Binding IsIgnored}" IsReadOnly="True" />
                         <!--<DataGridCheckBoxColumn Header="Ignore" Binding="{Binding IsIgnored}" />-->
                         <!--<DataGridCheckBoxColumn Header="Check for Singles" IsReadOnly="True" />
                         <DataGridTextColumn Header="New Albums Available" />-->
