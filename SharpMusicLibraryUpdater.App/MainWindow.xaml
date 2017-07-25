@@ -100,8 +100,16 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="New Albums Available">
+                            <DataGridTextColumn.Binding>
+                                <MultiBinding Converter="{StaticResource isIgnoredAndNewAlbumsToStatusConverter}">
+                                    <Binding Path="IsIgnored" />
+                                    <Binding Path="NewAlbums" />
+                                </MultiBinding>
+                            </DataGridTextColumn.Binding>
+                        </DataGridTextColumn>
                         <!--<DataGridCheckBoxColumn Header="Check for Singles" IsReadOnly="True" />
-                        <DataGridTextColumn Header="New Albums Available" />-->
+                         />-->
                     </DataGrid.Columns>
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
@@ -109,7 +117,7 @@
                                 <Setter.Value>
                                     <MultiBinding Converter="{StaticResource isIgnoredAndNewAlbumsToColorConverter}">
                                         <Binding Path="IsIgnored" />
-                                        <Binding Path="NewAlbums" Mode="TwoWay" />
+                                        <Binding Path="NewAlbums" />
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>

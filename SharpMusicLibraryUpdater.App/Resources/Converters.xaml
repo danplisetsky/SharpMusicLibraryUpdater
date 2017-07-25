@@ -4,4 +4,5 @@
     <local:NegateBooleanConverter x:Key="negateBooleanConverter" />
     <local:BooleanToColorConverter x:Key="booleanToColorConverter" />
     <local:IsIgnoredAndNewAlbumsToColorConverter x:Key="isIgnoredAndNewAlbumsToColorConverter" />
+    <local:IsIgnoredAndNewAlbumsToStatusConverter x:Key="isIgnoredAndNewAlbumsToStatusConverter" />
 </ResourceDictionary>
