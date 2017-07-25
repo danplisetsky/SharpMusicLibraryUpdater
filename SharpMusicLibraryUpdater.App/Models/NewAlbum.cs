@@ -9,11 +9,12 @@ namespace SharpMusicLibraryUpdater.App.Models
 {
     public class NewAlbum : Album
     {
-        public bool IgnoreInFutureChecks { get; set; }
         public LocalDate ReleaseDate { get; }
-        public NewAlbum(string name, LocalDate releaseDate, bool ignore = false) : base(name)
+        public bool MarkAsSeen { get; set; }
+
+        public NewAlbum(string name, LocalDate releaseDate, bool markAsSeen = false) : base(name)
         {
-            this.IgnoreInFutureChecks = ignore;
+            this.MarkAsSeen = markAsSeen;
             this.ReleaseDate = releaseDate;
         }
     }
