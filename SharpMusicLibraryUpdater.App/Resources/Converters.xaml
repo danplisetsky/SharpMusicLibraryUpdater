@@ -3,4 +3,5 @@
                     xmlns:local="clr-namespace:SharpMusicLibraryUpdater.App.Resources">
     <local:NegateBooleanConverter x:Key="negateBooleanConverter" />
     <local:BooleanToColorConverter x:Key="booleanToColorConverter" />
+    <local:IsIgnoredAndNewAlbumsToColorConverter x:Key="isIgnoredAndNewAlbumsToColorConverter" />
 </ResourceDictionary>

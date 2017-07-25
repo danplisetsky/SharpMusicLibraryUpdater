@@ -105,7 +105,14 @@
                     </DataGrid.Columns>
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
-                            <Setter Property="Background" Value="{Binding Color}" />
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource isIgnoredAndNewAlbumsToColorConverter}">
+                                        <Binding Path="IsIgnored" />
+                                        <Binding Path="NewAlbums" Mode="TwoWay" />
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </DataGrid.RowStyle>
                     <i:Interaction.Triggers>

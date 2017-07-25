@@ -25,7 +25,6 @@
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserResizeRows" Value="False" />
         <Setter Property="CanUserReorderColumns" Value="False" />
-        <Setter Property="IsSynchronizedWithCurrentItem" Value="True" />
     </Style>
 
     <Style TargetType="DataGridColumnHeader">

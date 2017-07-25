@@ -83,7 +83,6 @@ namespace SharpMusicLibraryUpdater.App.Models
                 if (_isIgnored != value)
                 {
                     _isIgnored = value;
-                    this.Color = _isIgnored ? Brushes.White : this.Color;
                     OnPropertyChanged();
                 }
             }
@@ -129,22 +128,6 @@ namespace SharpMusicLibraryUpdater.App.Models
                 if (_newAlbums != value)
                 {
                     _newAlbums = value;
-                    this.Color = _newAlbums.Any() ? Brushes.Green : Brushes.Red;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private Brush _color;
-        [IgnoreDataMember]
-        public Brush Color
-        {
-            get => _color;
-            set
-            {
-                if (_color != value)
-                {
-                    _color = value;
                     OnPropertyChanged();
                 }
             }
