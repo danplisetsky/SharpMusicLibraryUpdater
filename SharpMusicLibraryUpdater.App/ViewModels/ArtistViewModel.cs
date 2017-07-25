@@ -83,7 +83,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void OnClosing(object param)
         {
-            settings.Artists = Artists.ToList();           
+            settings.Artists = Artists.ToList();
             SettingsSerializer.Serialize(settings);
         }
 
@@ -96,13 +96,29 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             await Task.Run(() => Parallel.ForEach(Artists.Where(ar => !ar.IsIgnored), async artist =>
             {
                 artist.LocalAlbums = GetLocalAlbums(artist.LocalPath);
-                artist.NewAlbums = await GetAlbumsFromITunesAsync(artist);
+                var newAlbumsFromiTunes = await GetAlbumsFromiTunesAsync(artist);
+                artist.NewAlbums = AddOnlyNewAlbums(newAlbumsFromiTunes, artist.NewAlbums);
             }));
 
             this.IsNotBusy = true;
+
+            List<NewAlbum> AddOnlyNewAlbums(List<NewAlbum> newAlbumsFromiTunes, List<NewAlbum> newAlbums)
+            {
+                if (newAlbums == null)
+                    return newAlbumsFromiTunes;
+
+                var result = new List<NewAlbum>();
+                var albumsIds = newAlbums.Select(al => al.AlbumId);
+                foreach (var album in newAlbumsFromiTunes)
+                {
+                    if (!albumsIds.Contains(album.AlbumId))
+                        result.Add(album);
+                }
+                return result.Union(newAlbums).ToList();
+            }
         }
 
-        private async Task<List<NewAlbum>> GetAlbumsFromITunesAsync(Artist artist)
+        private async Task<List<NewAlbum>> GetAlbumsFromiTunesAsync(Artist artist)
         {
             var iTunesAlbumsSearchResult = (await searchManager.GetAlbumsByArtistIdAsync(artist.ArtistId)).Albums
                 .Where(al => !(String.IsNullOrWhiteSpace(al.CollectionName) || String.IsNullOrEmpty(al.CollectionName)));
@@ -119,7 +135,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                   .Select(kvp => kvp.Key);
 
             return iTunesAlbumsSearchResult.Where(al => newAlbumsIds.Contains(al.CollectionId))
-                .Select(al => new NewAlbum(al.CollectionName, LocalDate.FromDateTime(DateTime.Parse(al.ReleaseDate))))
+                .Select(al => new NewAlbum(al.CollectionName, al.CollectionId, LocalDate.FromDateTime(DateTime.Parse(al.ReleaseDate))))
                 .OrderBy(na => na.ReleaseDate).ToList();
 
 
@@ -178,7 +194,8 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                             ITunesName = artist.ITunesName,
                             ArtistId = artist.ArtistId,
                             IsIgnored = artist.IsIgnored,
-                            LocalPath = artist.LocalPath
+                            LocalPath = artist.LocalPath,
+                            NewAlbums = artist.NewAlbums
                         });
                     }
                     else

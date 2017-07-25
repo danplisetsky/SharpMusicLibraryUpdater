@@ -100,13 +100,19 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <!--<DataGridCheckBoxColumn Header="Ignore" Binding="{Binding IsIgnored}" />-->
                         <!--<DataGridCheckBoxColumn Header="Check for Singles" IsReadOnly="True" />
                         <DataGridTextColumn Header="New Albums Available" />-->
                     </DataGrid.Columns>
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
-                            <Setter Property="Background" Value="{Binding Color}" />
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource isIgnoredAndNewAlbumsToColorConverter}">
+                                        <Binding Path="IsIgnored" />
+                                        <Binding Path="NewAlbums" Mode="TwoWay" />
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </DataGrid.RowStyle>
                     <i:Interaction.Triggers>
@@ -125,8 +131,19 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding AlbumName}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Release Date" Binding="{Binding ReleaseDate}" IsReadOnly="True" />
-                        <!--<DataGridCheckBoxColumn Header="Ignore in Future Checks" IsReadOnly="True" />-->
+                        <DataGridTemplateColumn Header="Mark As Seen">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding MarkAsSeen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="{Binding MarkAsSeen, Converter={StaticResource booleanToColorConverter}}" />
+                        </Style>
+                    </DataGrid.RowStyle>
                 </DataGrid>
             </GroupBox>
         </Grid>
