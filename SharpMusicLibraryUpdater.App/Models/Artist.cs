@@ -119,7 +119,7 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private List<NewAlbum> _newAlbums;
-        [IgnoreDataMember]
+        [DataMember]
         public List<NewAlbum> NewAlbums
         {
             get => _newAlbums;

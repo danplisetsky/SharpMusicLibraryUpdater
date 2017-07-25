@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using NodaTime;
 
 namespace SharpMusicLibraryUpdater.App.Models
 {
+    [DataContract]
     public class NewAlbum : Album,  INotifyPropertyChanged
     {
-        public long AlbumId { get; }
-        public LocalDate ReleaseDate { get; }
+        [DataMember]
+        public long AlbumId { get; private set; }
+
+        [DataMember]
+        public LocalDate ReleaseDate { get; private set; }
 
         private bool _markAsSeen;
+        [DataMember]
         public bool MarkAsSeen
         {
             get => _markAsSeen;
