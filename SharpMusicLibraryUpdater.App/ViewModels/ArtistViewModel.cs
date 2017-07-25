@@ -83,15 +83,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void OnClosing(object param)
         {
-            settings.Artists = Artists.Select(ar => new Artist
-            {
-                ArtistId = ar.ArtistId,
-                ITunesName = ar.ITunesName,
-                Name = ar.Name,
-                IsIgnored = ar.IsIgnored,
-                LocalPath = ar.LocalPath
-            })
-                .ToList();
+            settings.Artists = Artists.ToList();           
             SettingsSerializer.Serialize(settings);
         }
 
