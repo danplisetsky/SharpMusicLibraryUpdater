@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Windows.Media;
@@ -59,6 +60,23 @@ namespace SharpMusicLibraryUpdater.App.Models
             }
         }
 
+        private string _localPath;
+
+        [DataMember]
+        public string LocalPath
+        {
+            get => _localPath;
+            set
+            {
+                if (_localPath != value)
+                {
+                    _localPath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         private bool _isIgnored;
 
         [DataMember]
@@ -70,6 +88,7 @@ namespace SharpMusicLibraryUpdater.App.Models
                 if (_isIgnored != value)
                 {
                     _isIgnored = value;
+                    this.Color = _isIgnored ? Brushes.White : this.Color;
                     OnPropertyChanged();
                 }
             }
@@ -118,6 +137,7 @@ namespace SharpMusicLibraryUpdater.App.Models
                 if (_newAlbums != value)
                 {
                     _newAlbums = value;
+                    this.Color = _newAlbums.Any() ? Brushes.Green : Brushes.Red;
                     OnPropertyChanged();
                 }
             }

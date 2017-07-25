@@ -62,7 +62,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             this.settings = SettingsSerializer.Deserialize();
 
             this.OpenMusicLibraryCommand = new DelegateCommand(this.OpenMusicLibrary, this.CommandCanAlwaysExecute);
-            this.GetAlbumsCommand = new DelegateCommand(this.GetAlbumsFromITunes, this.CanGetAlbums);
+            this.GetAlbumsCommand = new DelegateCommand(this.GetAlbums, this.CanGetAlbums);
             this.ShowAlbumsCommand = new DelegateCommand(this.ShowAlbums, this.CanGetAlbums);
             this.OnClosingCommand = new DelegateCommand(this.OnClosing, this.CommandCanAlwaysExecute);
 
@@ -72,7 +72,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
             this.ReadSettings();
         }
-        
+
         private void ReadSettings()
         {
             if (!String.IsNullOrEmpty(settings.MusicLibraryFolder))
@@ -83,48 +83,55 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void OnClosing(object param)
         {
-            settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, ITunesName = ar.ITunesName, Name = ar.Name, IsIgnored = ar.IsIgnored,
-                CheckForSingles = ar.CheckForSingles })
+            settings.Artists = Artists.Select(ar => new Artist
+            {
+                ArtistId = ar.ArtistId,
+                ITunesName = ar.ITunesName,
+                Name = ar.Name,
+                IsIgnored = ar.IsIgnored,
+                CheckForSingles = ar.CheckForSingles
+            })
                 .ToList();
             SettingsSerializer.Serialize(settings);
         }
 
         private void ShowAlbums(object param) => dataGridAlbums.DataContext = param as Artist;
 
-        private async void GetAlbumsFromITunes(object param)
+        private async void GetAlbums(object param)
         {
             this.IsNotBusy = false;
 
-            await Task.Run(() => Parallel.ForEach(Artists, async artist =>
+            await Task.Run(() => Parallel.ForEach(Artists.Where(ar => !ar.IsIgnored), async artist =>
             {
-                artist.NewAlbums = await GetNewAlbumsAsync(artist);
-                artist.Color = artist.NewAlbums.Any() ? Brushes.Green : Brushes.Red;
+                artist.LocalAlbums = GetLocalAlbums(artist.LocalPath);
+                artist.NewAlbums = await GetAlbumsFromITunesAsync(artist);
             }));
 
             this.IsNotBusy = true;
+        }
+
+        private async Task<List<NewAlbum>> GetAlbumsFromITunesAsync(Artist artist)
+        {
+            var iTunesAlbumsSearchResult = (await searchManager.GetAlbumsByArtistIdAsync(artist.ArtistId)).Albums
+                .Where(al => !(String.IsNullOrWhiteSpace(al.CollectionName) || String.IsNullOrEmpty(al.CollectionName)));
+            var localAlbumsReadyToCompare = artist.LocalAlbums.Select(al => ReadyToCompare(al.AlbumName)).ToList();
+            // TODO: Implement checks for singles, then add distinct back
+            var iTunesAlbumsReadyToCompare = iTunesAlbumsSearchResult
+                .Select(al => new { Id = al.CollectionId, Name = ReadyToCompare(GetFormattedAlbumName(al.CollectionName, isLocalFolder: false)) })
+                .ToDictionary(x => x.Id, x => x.Name);
+            var newAlbums = iTunesAlbumsReadyToCompare.Select(kvp => kvp.Value)
+                .Except(localAlbumsReadyToCompare).ToList();
+
+            var newAlbumsIds = iTunesAlbumsReadyToCompare
+                  .Where(kvp => newAlbums.Contains(kvp.Value))
+                  .Select(kvp => kvp.Key);
+
+            return iTunesAlbumsSearchResult.Where(al => newAlbumsIds.Contains(al.CollectionId))
+                .Select(al => new NewAlbum(al.CollectionName, LocalDate.FromDateTime(DateTime.Parse(al.ReleaseDate))))
+                .OrderBy(na => na.ReleaseDate).ToList();
+
 
             string ReadyToCompare(string input) => input.Replace("&", "and").Replace(" ", "").ToUpperInvariant();
-
-            async Task<List<NewAlbum>> GetNewAlbumsAsync(Artist artist)
-            {
-                var iTunesAlbumsSearchResult = (await searchManager.GetAlbumsByArtistIdAsync(artist.ArtistId)).Albums
-                    .Where(al => !(String.IsNullOrWhiteSpace(al.CollectionName) || String.IsNullOrEmpty(al.CollectionName)));
-                var localAlbumsReadyToCompare = artist.LocalAlbums.Select(al => ReadyToCompare(al.AlbumName)).ToList();
-                // TODO: Implement checks for singles, then add distinct back
-                var iTunesAlbumsReadyToCompare = iTunesAlbumsSearchResult
-                    .Select(al => new { Id = al.CollectionId, Name = ReadyToCompare(GetFormattedAlbumName(al.CollectionName, isLocalFolder: false)) })
-                    .ToDictionary(x => x.Id, x => x.Name);
-                var newAlbums = iTunesAlbumsReadyToCompare.Select(kvp => kvp.Value)
-                    .Except(localAlbumsReadyToCompare).ToList();
-
-                var newAlbumsIds = iTunesAlbumsReadyToCompare
-                      .Where(kvp => newAlbums.Contains(kvp.Value))
-                      .Select(kvp => kvp.Key);
-
-                return iTunesAlbumsSearchResult.Where(al => newAlbumsIds.Contains(al.CollectionId))
-                    .Select(al => new NewAlbum(al.CollectionName, LocalDate.FromDateTime(DateTime.Parse(al.ReleaseDate))))
-                    .OrderBy(na => na.ReleaseDate).ToList(); 
-            }
         }
 
         bool CanGetAlbums(object param) => this.Artists.Any();
@@ -173,8 +180,14 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                     var artist = settings.Artists.Find(ar => ar.Name == artistName);
                     if (artist != null)
                     {
-                        this.Artists.Add(new Artist { Name = artist.Name, ITunesName = artist.ITunesName, ArtistId = artist.ArtistId, IsIgnored = artist.IsIgnored,
-                            LocalAlbums = GetLocalAlbums(artistFolder)});
+                        this.Artists.Add(new Artist
+                        {
+                            Name = artist.Name,
+                            ITunesName = artist.ITunesName,
+                            ArtistId = artist.ArtistId,
+                            IsIgnored = artist.IsIgnored,
+                            LocalPath = artist.LocalPath
+                        });
                     }
                     else
                     {
@@ -195,8 +208,13 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 var iTunesArtistInfo = (await searchManager.GetSongArtistsAsync(artistName)).Artists.FirstOrDefault();
                 if (iTunesArtistInfo != null)
                 {
-                    this.Artists.Add(new Artist { Name = artistName, ITunesName = iTunesArtistInfo.ArtistName, ArtistId = iTunesArtistInfo.ArtistId,
-                        LocalAlbums = GetLocalAlbums(artistFolder) });
+                    this.Artists.Add(new Artist
+                    {
+                        Name = artistName,
+                        ITunesName = iTunesArtistInfo.ArtistName,
+                        ArtistId = iTunesArtistInfo.ArtistId,
+                        LocalPath = artistFolder
+                    });
                 }
             }
         }
@@ -264,7 +282,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                     .ToArray()).Trim();
                 return finalName;
 
-                bool IsAcceptableChar(char c) => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) || c == '&' || c ==',';
+                bool IsAcceptableChar(char c) => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) || c == '&' || c == ',';
             }
         }
 
