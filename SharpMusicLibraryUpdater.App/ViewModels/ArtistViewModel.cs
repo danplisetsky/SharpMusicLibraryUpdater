@@ -89,7 +89,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 ITunesName = ar.ITunesName,
                 Name = ar.Name,
                 IsIgnored = ar.IsIgnored,
-                CheckForSingles = ar.CheckForSingles
+                LocalPath = ar.LocalPath
             })
                 .ToList();
             SettingsSerializer.Serialize(settings);

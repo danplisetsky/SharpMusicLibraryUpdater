@@ -13,7 +13,6 @@ namespace SharpMusicLibraryUpdater.App.Models
     public class Artist : INotifyPropertyChanged
     {
         private long _artistId;
-
         [DataMember]
         public long ArtistId
         {
@@ -29,7 +28,6 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private string _name;
-
         [DataMember]
         public string Name
         {
@@ -45,7 +43,6 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private string _iTunesName;
-
         [DataMember]
         public string ITunesName
         {
@@ -61,7 +58,6 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private string _localPath;
-
         [DataMember]
         public string LocalPath
         {
@@ -78,7 +74,6 @@ namespace SharpMusicLibraryUpdater.App.Models
 
 
         private bool _isIgnored;
-
         [DataMember]
         public bool IsIgnored
         {
@@ -95,7 +90,6 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private bool _checkForSingles;
-
         [DataMember]
         public bool CheckForSingles
         {
@@ -111,7 +105,6 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private List<Album> _localAlbums;
-
         [IgnoreDataMember]
         public List<Album> LocalAlbums
         {
@@ -127,7 +120,6 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private List<NewAlbum> _newAlbums;
-
         [IgnoreDataMember]
         public List<NewAlbum> NewAlbums
         {
@@ -144,7 +136,6 @@ namespace SharpMusicLibraryUpdater.App.Models
         }
 
         private Brush _color;
-
         [IgnoreDataMember]
         public Brush Color
         {
