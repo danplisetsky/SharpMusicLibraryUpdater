@@ -92,6 +92,7 @@
                 <DataGrid Name="dataGrid_Artists" AutoGenerateColumns="False" ItemsSource="{Binding ModelCollectionView}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="iTunes Name" Binding="{Binding ITunesName}" IsReadOnly="True" />
                         <!--<DataGridCheckBoxColumn Header="Ignore" IsReadOnly="True" />
                         <DataGridCheckBoxColumn Header="Check for Singles" IsReadOnly="True" />
                         <DataGridTextColumn Header="New Albums Available" />-->

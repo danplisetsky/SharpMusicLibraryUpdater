@@ -43,6 +43,22 @@ namespace SharpMusicLibraryUpdater.App.Models
             }
         }
 
+        private string _iTunesName;
+
+        [DataMember]
+        public string ITunesName
+        {
+            get => _iTunesName;
+            set
+            {
+                if (_iTunesName != value)
+                {
+                    _iTunesName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private bool _isIgnored;
 
         [DataMember]

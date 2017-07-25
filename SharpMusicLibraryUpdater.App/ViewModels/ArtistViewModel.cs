@@ -83,7 +83,8 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void OnClosing(object param)
         {
-            settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, Name = ar.Name, IsIgnored = ar.IsIgnored, CheckForSingles = ar.CheckForSingles })
+            settings.Artists = Artists.Select(ar => new Artist { ArtistId = ar.ArtistId, ITunesName = ar.ITunesName, Name = ar.Name, IsIgnored = ar.IsIgnored,
+                CheckForSingles = ar.CheckForSingles })
                 .ToList();
             SettingsSerializer.Serialize(settings);
         }
@@ -172,7 +173,8 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                     var artist = settings.Artists.Find(ar => ar.Name == artistName);
                     if (artist != null)
                     {
-                        this.Artists.Add(new Artist { Name = artist.Name, ArtistId = artist.ArtistId, LocalAlbums = GetLocalAlbums(artistFolder)});
+                        this.Artists.Add(new Artist { Name = artist.Name, ITunesName = artist.ITunesName, ArtistId = artist.ArtistId,
+                            LocalAlbums = GetLocalAlbums(artistFolder)});
                     }
                     else
                     {
@@ -193,7 +195,8 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 var iTunesArtistInfo = (await searchManager.GetSongArtistsAsync(artistName)).Artists.FirstOrDefault();
                 if (iTunesArtistInfo != null)
                 {
-                    this.Artists.Add(new Artist { Name = artistName, ArtistId = iTunesArtistInfo.ArtistId, LocalAlbums = GetLocalAlbums(artistFolder) });
+                    this.Artists.Add(new Artist { Name = artistName, ITunesName = iTunesArtistInfo.ArtistName, ArtistId = iTunesArtistInfo.ArtistId,
+                        LocalAlbums = GetLocalAlbums(artistFolder) });
                 }
             }
         }
