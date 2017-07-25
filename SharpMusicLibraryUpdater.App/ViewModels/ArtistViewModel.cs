@@ -54,6 +54,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         public ICommand GetAlbumsCommand { get; }
         public ICommand ShowAlbumsCommand { get; }
         public ICommand OnClosingCommand { get; }
+        public ICommand IgnoreArtistCommand { get;  }
 
         public ArtistViewModel(MusicLibraryReader musicLibraryReader, iTunesSearchManager iTunesSearchManager, DataGrid dataGrid_Albums)
         {
@@ -65,12 +66,21 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             this.GetAlbumsCommand = new DelegateCommand(this.GetAlbumsFromITunes, this.CanGetAlbums);
             this.ShowAlbumsCommand = new DelegateCommand(this.ShowAlbums, this.CanGetAlbums);
             this.OnClosingCommand = new DelegateCommand(this.OnClosing, this.CommandCanAlwaysExecute);
+            this.IgnoreArtistCommand = new DelegateCommand(this.IgnoreArtist, this.CanGetAlbums);
 
             this.ModelCollectionView = new ListCollectionView(Artists);
 
             this.dataGridAlbums = dataGrid_Albums;
 
             this.ReadSettings();
+        }
+
+        private void IgnoreArtist(object param)
+        {
+            //if (param is Artist artist)
+            //{
+            //    artist.IsIgnored = !artist.IsIgnored;
+            //}
         }
 
         private void ReadSettings()
@@ -173,7 +183,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                     var artist = settings.Artists.Find(ar => ar.Name == artistName);
                     if (artist != null)
                     {
-                        this.Artists.Add(new Artist { Name = artist.Name, ITunesName = artist.ITunesName, ArtistId = artist.ArtistId,
+                        this.Artists.Add(new Artist { Name = artist.Name, ITunesName = artist.ITunesName, ArtistId = artist.ArtistId, IsIgnored = artist.IsIgnored,
                             LocalAlbums = GetLocalAlbums(artistFolder)});
                     }
                     else

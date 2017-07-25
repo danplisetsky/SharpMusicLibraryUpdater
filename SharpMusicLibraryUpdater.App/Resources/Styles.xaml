@@ -32,4 +32,8 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
     </Style>
 
+    <Style TargetType="CheckBox">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
 </ResourceDictionary>
