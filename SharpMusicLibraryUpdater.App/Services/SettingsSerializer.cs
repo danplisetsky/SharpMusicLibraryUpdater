@@ -5,21 +5,22 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace SharpMusicLibraryUpdater.App.Services
 {
     public static class SettingsSerializer
     {
-        private static Stream fileStream;
         private static DataContractSerializer serializer = new DataContractSerializer(typeof(Settings));
         private static readonly string settingsFilename = "settings.bin";
         private static readonly string settingsFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, settingsFilename);
 
         public static void SaveSettings(Settings settings)
         {
-            using (fileStream = new FileStream(settingsFilename, FileMode.Create))
+            using (var fileStream = new FileStream(settingsFilename, FileMode.Create))
+            using (var binaryWriter = XmlDictionaryWriter.CreateBinaryWriter(fileStream))
             {
-                serializer.WriteObject(fileStream, settings);
+                serializer.WriteObject(binaryWriter, settings);
             }
         }
 
@@ -27,9 +28,10 @@ namespace SharpMusicLibraryUpdater.App.Services
         {
             if (File.Exists(settingsFullPath))
             {
-                using (fileStream = new FileStream(settingsFilename, FileMode.Open))
+                using (var fileStream = new FileStream(settingsFilename, FileMode.Open))
+                using (var binaryReader = XmlDictionaryReader.CreateBinaryReader(fileStream, new XmlDictionaryReaderQuotas()))
                 {
-                    return (Settings)serializer.ReadObject(fileStream);
+                    return (Settings)serializer.ReadObject(binaryReader);
                 }
             }
             return new Settings();
