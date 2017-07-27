@@ -27,7 +27,7 @@ namespace SharpMusicLibraryUpdater.App
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(), dataGrid_Albums);
+            this.DataContext = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(), SettingsSerializer.LoadSettings());
         }
 
         private void CommandBindingCloseWindow_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;

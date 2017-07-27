@@ -24,14 +24,30 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 {
     public class ArtistViewModel : INotifyPropertyChanged
     {
+        #region Fields
+
         private readonly MusicLibraryReader musicLibraryReader;
         private readonly iTunesSearchManager searchManager;
         private readonly Settings settings;
 
-        private readonly ObservableCollection<Artist> Artists = new ObservableCollection<Artist>();
-        public ListCollectionView ModelCollectionView { get; private set; }
+        #endregion Fields
 
-        private DataGrid dataGridAlbums;
+        public ObservableCollection<Artist> Artists { get; set; } = new ObservableCollection<Artist>();
+
+        private Artist _currentlySelectedArtist;
+
+        public Artist CurrentlySelectedArtist
+        {
+            get => _currentlySelectedArtist;
+            set
+            {
+                if (_currentlySelectedArtist != value)
+                {
+                    _currentlySelectedArtist = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         private bool _isNotBusy = true;
         public bool IsNotBusy
@@ -48,27 +64,24 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        private void OnPropertyChanged([CallerMemberName] string prop = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
 
         public ICommand OpenMusicLibraryCommand { get; }
         public ICommand GetAlbumsCommand { get; }
         public ICommand ShowAlbumsCommand { get; }
         public ICommand OnClosingCommand { get; }
 
-        public ArtistViewModel(MusicLibraryReader musicLibraryReader, iTunesSearchManager iTunesSearchManager, DataGrid dataGrid_Albums)
+        public ArtistViewModel(MusicLibraryReader musicLibraryReader, iTunesSearchManager iTunesSearchManager, Settings settings)
         {
-            this.searchManager = iTunesSearchManager;
             this.musicLibraryReader = musicLibraryReader;
-            this.settings = SettingsSerializer.Deserialize();
+            this.searchManager = iTunesSearchManager;
+            this.settings = settings;
 
             this.OpenMusicLibraryCommand = new DelegateCommand(this.OpenMusicLibrary, this.CommandCanAlwaysExecute);
             this.GetAlbumsCommand = new DelegateCommand(this.GetAlbums, this.CanGetAlbums);
             this.ShowAlbumsCommand = new DelegateCommand(this.ShowAlbums, this.CanGetAlbums);
             this.OnClosingCommand = new DelegateCommand(this.OnClosing, this.CommandCanAlwaysExecute);
-
-            this.ModelCollectionView = new ListCollectionView(Artists);
-
-            this.dataGridAlbums = dataGrid_Albums;
 
             this.ReadSettings();
         }
@@ -83,17 +96,17 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void OnClosing(object param)
         {
-            settings.Artists = Artists.ToList();
-            SettingsSerializer.Serialize(settings);
+            settings.Artists = this.Artists.ToList();
+            SettingsSerializer.SaveSettings(settings);
         }
 
-        private void ShowAlbums(object param) => dataGridAlbums.DataContext = param as Artist;
+        private void ShowAlbums(object param) => this.CurrentlySelectedArtist = param as Artist;
 
         private async void GetAlbums(object param)
         {
             this.IsNotBusy = false;
 
-            await Task.Run(() => Parallel.ForEach(Artists.Where(ar => !ar.IsIgnored), async artist =>
+            await Task.Run(() => Parallel.ForEach(this.Artists.Where(ar => !ar.IsIgnored), async artist =>
             {
                 artist.LocalAlbums = GetLocalAlbums(artist.LocalPath);
                 var newAlbumsFromiTunes = await GetAlbumsFromiTunesAsync(artist);

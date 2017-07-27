@@ -15,7 +15,7 @@ namespace SharpMusicLibraryUpdater.App.Services
         private static readonly string settingsFilename = "settings.bin";
         private static readonly string settingsFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, settingsFilename);
 
-        public static void Serialize(Settings settings)
+        public static void SaveSettings(Settings settings)
         {
             using (fileStream = new FileStream(settingsFilename, FileMode.Create))
             {
@@ -23,7 +23,7 @@ namespace SharpMusicLibraryUpdater.App.Services
             }
         }
 
-        public static Settings Deserialize()
+        public static Settings LoadSettings()
         {
             if (File.Exists(settingsFullPath))
             {

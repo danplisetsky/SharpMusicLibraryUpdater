@@ -89,7 +89,7 @@
 
         <Grid Grid.Row="2" Grid.Column="0">
             <GroupBox Header="Artists">                
-                <DataGrid Name="dataGrid_Artists" AutoGenerateColumns="False" ItemsSource="{Binding ModelCollectionView}">
+                <DataGrid Name="dataGrid_Artists" AutoGenerateColumns="False" ItemsSource="{Binding Artists}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
                         <DataGridTextColumn Header="iTunes Name" Binding="{Binding ITunesName}" IsReadOnly="True" />
@@ -135,7 +135,8 @@
         
         <Grid Grid.Row="2" Grid.Column="1">
             <GroupBox Header="New Albums">
-                <DataGrid Name="dataGrid_Albums" AutoGenerateColumns="False" ItemsSource="{Binding NewAlbums}">
+                <DataGrid Name="dataGrid_Albums" AutoGenerateColumns="False" ItemsSource="{Binding NewAlbums}"
+                          DataContext="{Binding CurrentlySelectedArtist}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding AlbumName}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Release Date" Binding="{Binding ReleaseDate}" IsReadOnly="True" />
