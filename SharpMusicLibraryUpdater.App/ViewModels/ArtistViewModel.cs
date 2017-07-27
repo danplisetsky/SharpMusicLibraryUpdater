@@ -28,6 +28,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private readonly MusicLibraryReader musicLibraryReader;
         private readonly iTunesSearchManager searchManager;
+        private readonly SettingsSerializer settingsSerializer;
         private readonly Settings settings;
 
         #endregion Fields
@@ -72,11 +73,12 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         public ICommand ShowAlbumsCommand { get; }
         public ICommand OnClosingCommand { get; }
 
-        public ArtistViewModel(MusicLibraryReader musicLibraryReader, iTunesSearchManager iTunesSearchManager, Settings settings)
+        public ArtistViewModel(MusicLibraryReader musicLibraryReader, iTunesSearchManager iTunesSearchManager, SettingsSerializer settingsSerializer)
         {
             this.musicLibraryReader = musicLibraryReader;
             this.searchManager = iTunesSearchManager;
-            this.settings = settings;
+            this.settingsSerializer = settingsSerializer;
+            this.settings = settingsSerializer.LoadSettings();
 
             this.OpenMusicLibraryCommand = new DelegateCommand(this.OpenMusicLibrary, this.CommandCanAlwaysExecute);
             this.GetAlbumsCommand = new DelegateCommand(this.GetAlbums, this.CanGetAlbums);
@@ -97,7 +99,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         private void OnClosing(object param)
         {
             settings.Artists = this.Artists.ToList();
-            SettingsSerializer.SaveSettings(settings);
+            settingsSerializer.SaveSettings(settings);
         }
 
         private void ShowAlbums(object param) => this.CurrentlySelectedArtist = param as Artist;

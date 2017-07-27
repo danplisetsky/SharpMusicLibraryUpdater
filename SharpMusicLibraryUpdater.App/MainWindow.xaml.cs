@@ -11,11 +11,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using SharpMusicLibraryUpdater.App.ViewModels;
 using SharpMusicLibraryUpdater.App.Services;
 using iTunesSearch.Library;
 using System.Windows.Interactivity;
+using System.IO;
 
 namespace SharpMusicLibraryUpdater.App
 {
@@ -24,10 +24,15 @@ namespace SharpMusicLibraryUpdater.App
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly string settingsFilename = "settings.bin";
+        private static readonly string settingsFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, settingsFilename);
+
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(), SettingsSerializer.LoadSettings());
+            this.DataContext = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
+                new SettingsSerializer(new FileStream(settingsFullPath, FileMode.OpenOrCreate))
+                );
         }
 
         private void CommandBindingCloseWindow_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;

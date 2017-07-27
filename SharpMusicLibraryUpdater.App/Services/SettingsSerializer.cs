@@ -9,32 +9,39 @@ using System.Xml;
 
 namespace SharpMusicLibraryUpdater.App.Services
 {
-    public static class SettingsSerializer
+    public class SettingsSerializer
     {
-        private static DataContractSerializer serializer = new DataContractSerializer(typeof(Settings));
-        private static readonly string settingsFilename = "settings.bin";
-        private static readonly string settingsFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, settingsFilename);
+        private DataContractSerializer serializer = new DataContractSerializer(typeof(Settings));
+        private readonly Stream stream;
 
-        public static void SaveSettings(Settings settings)
+        public SettingsSerializer(Stream stream)
         {
-            using (var fileStream = new FileStream(settingsFilename, FileMode.Create))
-            using (var binaryWriter = XmlDictionaryWriter.CreateBinaryWriter(fileStream))
+            this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        }
+
+        public void SaveSettings(Settings settings)
+        {
+            using (var binaryWriter = XmlDictionaryWriter.CreateBinaryWriter(stream))
             {
                 serializer.WriteObject(binaryWriter, settings);
             }
         }
 
-        public static Settings LoadSettings()
+        public Settings LoadSettings()
         {
-            if (File.Exists(settingsFullPath))
+            using (var binaryReader = XmlDictionaryReader.CreateBinaryReader(stream, new XmlDictionaryReaderQuotas()))
+            using (var xmlReader = XmlReader.Create(binaryReader, new XmlReaderSettings { CloseInput = false }))
             {
-                using (var fileStream = new FileStream(settingsFilename, FileMode.Open))
-                using (var binaryReader = XmlDictionaryReader.CreateBinaryReader(fileStream, new XmlDictionaryReaderQuotas()))
+                try
                 {
-                    return (Settings)serializer.ReadObject(binaryReader);
+                    return (Settings)serializer.ReadObject(xmlReader);
+                }
+                catch (Exception ex) when (ex is SerializationException || ex is FileNotFoundException)
+                {
+                    return new Settings();
                 }
             }
-            return new Settings();
         }
+
     }
 }
