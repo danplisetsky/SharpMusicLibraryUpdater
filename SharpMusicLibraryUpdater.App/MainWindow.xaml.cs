@@ -25,13 +25,13 @@ namespace SharpMusicLibraryUpdater.App
     public partial class MainWindow : Window
     {
         private static readonly string settingsFilename = "settings.bin";
-        private static readonly string settingsFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, settingsFilename);
+        private static readonly string settingsFileFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, settingsFilename);
 
         public MainWindow()
         {
             InitializeComponent();
             this.DataContext = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
-                new SettingsSerializer(new FileStream(settingsFullPath, FileMode.OpenOrCreate))
+                new SettingsSerializer(settingsFileFullPath)
                 );
         }
 

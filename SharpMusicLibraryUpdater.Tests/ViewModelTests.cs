@@ -14,27 +14,25 @@ using System.Text;
 namespace SharpMusicLibraryUpdater.Tests
 {
     [TestClass]
-    public class SharpMusicLibraryUpdaterTests
+    public class ViewModelTests
     {
         [TestMethod]
         public void NoSettings_EmptyArtistList()
         {
             var vm = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
-                new SettingsSerializer(new MemoryStream())
+                new SettingsSerializer(Path.GetRandomFileName())
                 );
             Assert.IsTrue(!vm.Artists.Any());
         }
 
         [TestMethod]
-        public void CorruptedSettingsFile_EmptyArtistsList(int x)
+        public void ReadCorruptedSettingsFile_EmptyArtistsList()
         {
-            string settings = "This is not binary";
-            var bytes = Encoding.ASCII.GetBytes(settings);
-
             var vm = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
-               new SettingsSerializer(new MemoryStream(bytes))
+               new SettingsSerializer(Path.GetTempFileName())
                );
             Assert.IsTrue(!vm.Artists.Any());
         }
+
     }
 }

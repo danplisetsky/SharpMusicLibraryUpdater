@@ -12,15 +12,16 @@ namespace SharpMusicLibraryUpdater.App.Services
     public class SettingsSerializer
     {
         private DataContractSerializer serializer = new DataContractSerializer(typeof(Settings));
-        private readonly Stream stream;
+        private readonly string settingsFileFullPath;
 
-        public SettingsSerializer(Stream stream)
+        public SettingsSerializer(String settingsFileFullPath)
         {
-            this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            this.settingsFileFullPath = settingsFileFullPath ?? throw new ArgumentNullException(nameof(settingsFileFullPath));
         }
 
         public void SaveSettings(Settings settings)
         {
+            var stream = GetStream(FileMode.Create);
             using (var binaryWriter = XmlDictionaryWriter.CreateBinaryWriter(stream))
             {
                 serializer.WriteObject(binaryWriter, settings);
@@ -29,17 +30,31 @@ namespace SharpMusicLibraryUpdater.App.Services
 
         public Settings LoadSettings()
         {
+            var stream = GetStream(FileMode.Open);
+            if (stream == null)
+                return new Settings();
             using (var binaryReader = XmlDictionaryReader.CreateBinaryReader(stream, new XmlDictionaryReaderQuotas()))
-            using (var xmlReader = XmlReader.Create(binaryReader, new XmlReaderSettings { CloseInput = false }))
             {
                 try
                 {
-                    return (Settings)serializer.ReadObject(xmlReader);
+                    return (Settings)serializer.ReadObject(binaryReader);
                 }
-                catch (Exception ex) when (ex is SerializationException || ex is FileNotFoundException)
+                catch (SerializationException)
                 {
                     return new Settings();
                 }
+            }
+        }
+
+        private FileStream GetStream(FileMode fileMode)
+        {
+            try
+            {
+                return new FileStream(this.settingsFileFullPath, fileMode);
+            }
+            catch (FileNotFoundException)
+            {
+                return null;
             }
         }
 
