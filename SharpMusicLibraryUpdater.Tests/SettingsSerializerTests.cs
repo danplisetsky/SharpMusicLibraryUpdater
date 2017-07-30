@@ -14,10 +14,39 @@ namespace SharpMusicLibraryUpdater.Tests
     public class SettingsSerializerTests
     {
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullPathInConstructor_ThrowException()
+        {
+            var settingsSerializer = new SettingsSerializer(null);
+        }
+
+        [TestMethod]
+        public void NoSettingsFile_ReturnsSettingsInstance()
+        {
+            string path = Path.GetRandomFileName();
+            var settingsSerializer = new SettingsSerializer(path);
+
+            var settings = settingsSerializer.LoadSettings();
+
+            Assert.IsInstanceOfType(settings, typeof(Settings));
+        }
+
+        [TestMethod]
+        public void CorruptedSettingsFile_ReturnsSettingsInstance()
+        {
+            string path = Path.GetTempFileName();
+            var settingsSerializer = new SettingsSerializer(path);
+
+            var settings = settingsSerializer.LoadSettings();
+
+            Assert.IsInstanceOfType(settings, typeof(Settings));
+        }
+
+        [TestMethod]
         public void SaveSettings_FileExists()
         {
             var settings = new Settings { MusicLibraryFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) };
-            string settingsFile = Path.GetRandomFileName();
+            string settingsFile = Path.GetTempFileName();
             var settingsSerializer = new SettingsSerializer(settingsFile);
 
             settingsSerializer.SaveSettings(settings);
@@ -26,10 +55,10 @@ namespace SharpMusicLibraryUpdater.Tests
         }
 
         [TestMethod]
-        public void SaveSettingsReadSettings_ReturnValidDeserializedObject()
+        public void SaveSettingsReadSettings_ReturnValidDeserializedSettingsObject()
         {
             var settings = new Settings { MusicLibraryFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) };
-            string settingsFile = Path.GetRandomFileName();
+            string settingsFile = Path.GetTempFileName();
             var settingsSerializer = new SettingsSerializer(settingsFile);
 
             settingsSerializer.SaveSettings(settings);

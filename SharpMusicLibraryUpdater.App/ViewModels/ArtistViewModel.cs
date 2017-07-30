@@ -90,7 +90,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
 
         private void ReadSettings()
         {
-            if (!String.IsNullOrEmpty(settings.MusicLibraryFolder))
+            if (!String.IsNullOrWhiteSpace(settings.MusicLibraryFolder))
             {
                 this.ReadMusicLibraryAsync(isLoadingFromSettings: true).Wait();
             }
@@ -136,7 +136,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         private async Task<List<NewAlbum>> GetAlbumsFromiTunesAsync(Artist artist)
         {
             var iTunesAlbumsSearchResult = (await searchManager.GetAlbumsByArtistIdAsync(artist.ArtistId)).Albums
-                .Where(al => !(String.IsNullOrWhiteSpace(al.CollectionName) || String.IsNullOrEmpty(al.CollectionName)));
+                .Where(al => !(String.IsNullOrWhiteSpace(al.CollectionName)/* || String.IsNullOrEmpty(al.CollectionName)*/));
             var localAlbumsReadyToCompare = artist.LocalAlbums.Select(al => ReadyToCompare(al.AlbumName)).ToList();
             // TODO: Implement checks for singles, then add distinct back
             var iTunesAlbumsReadyToCompare = iTunesAlbumsSearchResult
@@ -182,7 +182,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         private async void OpenMusicLibrary(object param)
         {
             settings.MusicLibraryFolder = this.SelectFolder();
-            if (String.IsNullOrEmpty(settings.MusicLibraryFolder))
+            if (String.IsNullOrWhiteSpace(settings.MusicLibraryFolder))
             {
                 return;
             }
@@ -256,7 +256,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 if (currentDir != artistFolder)
                 {
                     string formattedAlbumName = GetFormattedAlbumName(new DirectoryInfo(currentDir).Name, isLocalFolder: true);
-                    if (!String.IsNullOrEmpty(formattedAlbumName))
+                    if (!String.IsNullOrWhiteSpace(formattedAlbumName))
                     {
                         albums.Add(new Album(formattedAlbumName));
                     }
@@ -277,7 +277,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         private string GetFormattedAlbumName(string fullAlbumName, bool isLocalFolder)
         {
             string result = String.Empty;
-            if (String.IsNullOrEmpty(fullAlbumName))
+            if (String.IsNullOrWhiteSpace(fullAlbumName))
             {
                 return result;
             }
