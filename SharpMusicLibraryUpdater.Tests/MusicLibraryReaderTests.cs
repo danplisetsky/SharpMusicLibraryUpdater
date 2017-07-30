@@ -12,24 +12,32 @@ namespace SharpMusicLibraryUpdater.Tests
         private readonly string[] artists = new[] { "Nicola Benedetti", "R.E.M", "The Posies" };
         private string musicLibraryFolder;
 
-        [TestInitialize]
-        public void Initialize()
+        [TestMethod]
+        public void ReadMusicLibraryFolder_ReturnsAllFolders()
         {
             musicLibraryFolder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "TestMusicLibraryFolder")).FullName;
             foreach (string item in artists)
             {
                 Directory.CreateDirectory(Path.Combine(musicLibraryFolder, item));
             }
-        }
 
-        [TestMethod]
-        public void ReadMusciLibraryFolder_ReturnAllFolders()
-        {
             var mlr = new MusicLibraryReader();
 
             var artistsFolderNames = mlr.ReadMusicLibrary(musicLibraryFolder);
 
             Assert.IsTrue(artists.SequenceEqual(artistsFolderNames.Select(path => new DirectoryInfo(path).Name)));
+        }
+
+        [TestMethod]
+        public void MusicLibraryEmpty_ReturnsEmptyArray()
+        {
+            musicLibraryFolder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "TestMusicLibraryFolder")).FullName;
+
+            var mlr = new MusicLibraryReader();
+
+            var artistsFolderNames = mlr.ReadMusicLibrary(musicLibraryFolder);
+
+            Assert.IsTrue(!artistsFolderNames.Any());
         }
 
         [TestCleanup]

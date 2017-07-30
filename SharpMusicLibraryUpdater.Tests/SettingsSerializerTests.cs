@@ -14,10 +14,12 @@ namespace SharpMusicLibraryUpdater.Tests
     public class SettingsSerializerTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void NullPathInConstructor_ThrowException()
+        public void NullPathInConstructor_ThrowsException()
         {
-            var settingsSerializer = new SettingsSerializer(null);
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                var settingsSerializer = new SettingsSerializer(null);
+            });
         }
 
         [TestMethod]
@@ -55,7 +57,7 @@ namespace SharpMusicLibraryUpdater.Tests
         }
 
         [TestMethod]
-        public void SaveSettingsReadSettings_ReturnValidDeserializedSettingsObject()
+        public void SaveSettingsReadSettings_ReturnsValidDeserializedSettingsObject()
         {
             var settings = new Settings { MusicLibraryFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) };
             string settingsFile = Path.GetTempFileName();
