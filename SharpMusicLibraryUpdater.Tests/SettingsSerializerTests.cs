@@ -14,13 +14,10 @@ namespace SharpMusicLibraryUpdater.Tests
     public class SettingsSerializerTests
     {
         [TestMethod]
-        public void NullPathInConstructor_ThrowsException()
-        {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                var settingsSerializer = new SettingsSerializer(null);
-            });
-        }
+        public void NullPathInConstructor_ThrowsException() => Assert.ThrowsException<ArgumentNullException>(() =>
+                                                             {
+                                                                 var settingsSerializer = new SettingsSerializer(null);
+                                                             });
 
         [TestMethod]
         public void NoSettingsFile_ReturnsSettingsInstance()

@@ -16,23 +16,23 @@ namespace SharpMusicLibraryUpdater.Tests
     [TestClass]
     public class ViewModelTests
     {
-        //[TestMethod]
-        //public void NoSettings_EmptyArtistList()
-        //{
-        //    var vm = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
-        //        new SettingsSerializer(Path.GetRandomFileName())
-        //        );
-        //    Assert.IsTrue(!vm.Artists.Any());
-        //}
+        [TestMethod]
+        public void NoSettings_EmptyArtistList()
+        {
+            var vm = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
+                new SettingsSerializer(Path.GetRandomFileName())
+                );
+            Assert.IsTrue(!vm.Artists.Any());
+        }
 
-        //[TestMethod]
-        //public void ReadCorruptedSettingsFile_EmptyArtistsList()
-        //{
-        //    var vm = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
-        //       new SettingsSerializer(Path.GetTempFileName())
-        //       );
-        //    Assert.IsTrue(!vm.Artists.Any());
-        //}
+        [TestMethod]
+        public void ReadCorruptedSettingsFile_EmptyArtistsList()
+        {
+            var vm = new ArtistViewModel(new MusicLibraryReader(), new iTunesSearchManager(),
+               new SettingsSerializer(Path.GetTempFileName())
+               );
+            Assert.IsTrue(!vm.Artists.Any());
+        }
 
     }
 }

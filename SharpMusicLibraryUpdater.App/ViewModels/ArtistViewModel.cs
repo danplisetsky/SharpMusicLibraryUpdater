@@ -36,7 +36,6 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         public ObservableCollection<Artist> Artists { get; set; } = new ObservableCollection<Artist>();
 
         private Artist _currentlySelectedArtist;
-
         public Artist CurrentlySelectedArtist
         {
             get => _currentlySelectedArtist;
