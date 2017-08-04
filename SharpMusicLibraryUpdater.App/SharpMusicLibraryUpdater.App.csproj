@@ -84,6 +84,7 @@
     <Compile Include="Services\Settings.cs" />
     <Compile Include="Services\SettingsSerializer.cs" />
     <Compile Include="ViewModels\ArtistViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

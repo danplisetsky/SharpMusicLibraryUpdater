@@ -22,7 +22,7 @@ using System.Diagnostics;
 
 namespace SharpMusicLibraryUpdater.App.ViewModels
 {
-    public class ArtistViewModel : INotifyPropertyChanged
+    public class ArtistViewModel : ViewModelBase
     {
         #region Fields
 
@@ -32,6 +32,8 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
         private readonly Settings settings;
 
         #endregion Fields
+
+        #region Properties
 
         public ObservableCollection<Artist> Artists { get; set; } = new ObservableCollection<Artist>();
 
@@ -44,7 +46,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 if (_currentlySelectedArtist != value)
                 {
                     _currentlySelectedArtist = value;
-                    OnPropertyChanged();
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -58,25 +60,24 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
                 if (_isNotBusy != value)
                 {
                     _isNotBusy = value;
-                    OnPropertyChanged();
+                    this.OnPropertyChanged();
                 }
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string prop = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
 
         public ICommand OpenMusicLibraryCommand { get; }
         public ICommand GetAlbumsCommand { get; }
         public ICommand ShowAlbumsCommand { get; }
         public ICommand OnClosingCommand { get; }
+        
+        #endregion Properties
 
         public ArtistViewModel(MusicLibraryReader musicLibraryReader, iTunesSearchManager iTunesSearchManager, SettingsSerializer settingsSerializer)
         {
             this.musicLibraryReader = musicLibraryReader;
             this.searchManager = iTunesSearchManager;
             this.settingsSerializer = settingsSerializer;
+
             this.settings = settingsSerializer.LoadSettings();
 
             this.OpenMusicLibraryCommand = new DelegateCommand(this.OpenMusicLibrary, this.CommandCanAlwaysExecute);
