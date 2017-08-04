@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Name="mainWindow"
         Title="SharpMusicLibraryUpdater" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" AllowDrop="False"
-        IsEnabled="{Binding IsNotBusy}" MinHeight="600" MinWidth="800">
+        IsEnabled="{Binding IsNotBusy, UpdateSourceTrigger=PropertyChanged}" MinHeight="600" MinWidth="800">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
@@ -158,7 +158,8 @@
         </Grid>
 
         <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="20">
-            <ProgressBar IsIndeterminate="{Binding IsNotBusy, Converter={StaticResource negateBooleanConverter}}" MinWidth="100" MinHeight="15" />
+            <ProgressBar IsIndeterminate="{Binding IsNotBusy, Converter={StaticResource negateBooleanConverter}, UpdateSourceTrigger=PropertyChanged}" 
+                         MinWidth="100" MinHeight="15" />
         </StatusBar>
     </Grid>
 </Window>

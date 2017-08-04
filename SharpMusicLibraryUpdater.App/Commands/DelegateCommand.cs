@@ -34,5 +34,9 @@ namespace SharpMusicLibraryUpdater.App.Commands
         }
 
         public void Execute(object parameter) => executeAction(parameter);
+
+        public void RaiseCanExecuteChanged() =>
+                CanExecuteChanged?.Invoke(this, new EventArgs());
+
     }
 }

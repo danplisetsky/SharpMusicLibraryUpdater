@@ -85,14 +85,72 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             this.ShowAlbumsCommand = new DelegateCommand(this.ShowAlbums, this.CanGetAlbums);
             this.OnClosingCommand = new DelegateCommand(this.OnClosing, this.CommandCanAlwaysExecute);
 
+            this.Artists.CollectionChanged += this.OnCollectionChanged;
+
             this.ReadSettings();
         }
+
+        private void OnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) =>
+            ((DelegateCommand)this.GetAlbumsCommand).RaiseCanExecuteChanged();
 
         private void ReadSettings()
         {
             if (!String.IsNullOrWhiteSpace(settings.MusicLibraryFolder))
             {
                 this.ReadMusicLibraryAsync(isLoadingFromSettings: true).Wait();
+            }
+        }
+
+        private async Task ReadMusicLibraryAsync(bool isLoadingFromSettings)
+        {
+            this.IsNotBusy = false;
+
+            this.Artists.Clear();
+            var artistsFullLocalPath = musicLibraryReader.ReadMusicLibrary(settings.MusicLibraryFolder);
+            foreach (string artistFolder in artistsFullLocalPath)
+            {
+                string artistName = new DirectoryInfo(artistFolder).Name.Trim();
+                if (isLoadingFromSettings)
+                {
+                    var artist = settings.Artists.Find(ar => ar.Name == artistName);
+                    if (artist != null)
+                    {
+                        this.Artists.Add(new Artist
+                        {
+                            Name = artist.Name,
+                            ITunesName = artist.ITunesName,
+                            ArtistId = artist.ArtistId,
+                            IsIgnored = artist.IsIgnored,
+                            LocalPath = artist.LocalPath,
+                            NewAlbums = artist.NewAlbums
+                        });
+                    }
+                    else
+                    {
+                        await AddArtist(artistName, artistFolder);
+                    }
+                }
+                else
+                {
+                    await AddArtist(artistName, artistFolder);
+                }
+            }
+
+            this.IsNotBusy = true;
+
+            async Task AddArtist(string artistName, string artistFolder)
+            {
+                var iTunesArtistInfo = (await searchManager.GetSongArtistsAsync(artistName)).Artists.FirstOrDefault();
+                if (iTunesArtistInfo != null)
+                {
+                    this.Artists.Add(new Artist
+                    {
+                        Name = artistName,
+                        ITunesName = iTunesArtistInfo.ArtistName,
+                        ArtistId = iTunesArtistInfo.ArtistId,
+                        LocalPath = artistFolder
+                    });
+                }
             }
         }
 
@@ -189,59 +247,7 @@ namespace SharpMusicLibraryUpdater.App.ViewModels
             await ReadMusicLibraryAsync(isLoadingFromSettings: false);
         }
 
-        private async Task ReadMusicLibraryAsync(bool isLoadingFromSettings)
-        {
-            this.IsNotBusy = false;
-
-            this.Artists.Clear();
-            var artistsFullLocalPath = musicLibraryReader.ReadMusicLibrary(settings.MusicLibraryFolder);
-            foreach (string artistFolder in artistsFullLocalPath)
-            {
-                string artistName = new DirectoryInfo(artistFolder).Name.Trim();
-                if (isLoadingFromSettings)
-                {
-                    var artist = settings.Artists.Find(ar => ar.Name == artistName);
-                    if (artist != null)
-                    {
-                        this.Artists.Add(new Artist
-                        {
-                            Name = artist.Name,
-                            ITunesName = artist.ITunesName,
-                            ArtistId = artist.ArtistId,
-                            IsIgnored = artist.IsIgnored,
-                            LocalPath = artist.LocalPath,
-                            NewAlbums = artist.NewAlbums
-                        });
-                    }
-                    else
-                    {
-                        await AddArtist(artistName, artistFolder);
-                    }
-                }
-                else
-                {
-                    await AddArtist(artistName, artistFolder);
-                }
-            }
-
-            this.GetAlbumsCommand.CanExecute(null);
-            this.IsNotBusy = true;
-
-            async Task AddArtist(string artistName, string artistFolder)
-            {
-                var iTunesArtistInfo = (await searchManager.GetSongArtistsAsync(artistName)).Artists.FirstOrDefault();
-                if (iTunesArtistInfo != null)
-                {
-                    this.Artists.Add(new Artist
-                    {
-                        Name = artistName,
-                        ITunesName = iTunesArtistInfo.ArtistName,
-                        ArtistId = iTunesArtistInfo.ArtistId,
-                        LocalPath = artistFolder
-                    });
-                }
-            }
-        }
+        
 
         private List<Album> GetLocalAlbums(string artistFolder)
         {
