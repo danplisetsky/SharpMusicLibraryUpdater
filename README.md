@@ -10,4 +10,4 @@ Have a sizable music llibrary? Store it in a folder, band by band? Want to know 
 
 That's it!
 ## Any issues?
-Plenty, as this is an early release and only the most basic functionality is implemented. More to come! 
+In order to identify an album, the program expects it to contain a year in its name.
